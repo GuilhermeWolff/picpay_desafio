@@ -1,5 +1,5 @@
 package com.picpay.service;
-
+              
 
 import com.picpay.dto.TransactionDTO;
 import com.picpay.dto.authorization.AuthorizationDTO;
@@ -35,7 +35,7 @@ public class TransactionService {
         this.integrationApiService = integrationApiService;
     }
 
-    public Transaction createTransaction(TransactionDTO dto) {
+    public Transaction createTransaction(TransactionDTO dto) throws TransactionBusinessException {
         log.info("iniciando o processamento da transacao");
 
         User cliente = getUserById(dto.getClienteId());
@@ -46,37 +46,45 @@ public class TransactionService {
         if(!payer.getDesc().equalsIgnoreCase(CLIENTE_STR)){
             throw new TransactionBusinessException("Somente um cliente poderá transferir dinheiro para um lojista!");
         }
-
-        if(dto.getValor().compareTo(cliente.getSaldo()) > 0) {
-            throw new TransactionBusinessException("O cliente precisa ter saldo para a realizar a transferencia");
-        }
-
-        User lojista = getUserById(dto.getLojistaId());
-        Perfil payee = Perfil.toEnum(lojista.getPerfil());
-
-        if(!payee.getDesc().equalsIgnoreCase(LOJISTA_STR)){
-            throw new TransactionBusinessException("Somente um lojista poderá receber dinheiro de um cliente!");
-        }
-
-        AuthorizationDTO authorizationDTO = new AuthorizationDTO(cliente.getEmail(), cliente.getPassword());
-
-        boolean resultAuthorization = integrationApiService.authorizationRequest(authorizationDTO);
-        if(!resultAuthorization){
-            throw new TransactionBusinessException("A autorização ao cliente para a transação nao foi concedida!");
-        }
-
-
-        NotificationDTO notificationDTO = new NotificationDTO(lojista.getEmail(), NOTIFICATION_MSG_STR, dto.getValor());
-        boolean resultNotification = integrationApiService.sendNotificationRequest(notificationDTO);
-        if(!resultNotification){
-            throw new TransactionBusinessException("Falha ao notificar o lojista!");
-        }
-
-
-
+        
         return null;
-
     }
+    
+        public Transaction userTransaction(TransactionDTO dto) throws TransactionBusinessException {
+            User lojista = getUserById(dto.getLojistaId());
+            Perfil payee = Perfil.toEnum(lojista.getPerfil());
+
+            if(!payee.getDesc().equalsIgnoreCase(LOJISTA_STR)){
+                throw new TransactionBusinessException("Somente um lojista poderá receber dinheiro de um cliente!");}        
+            return null;
+    }
+        
+        
+        public Transaction authorizeTransaction(TransactionDTO dto) throws TransactionBusinessException {
+
+        	 User cliente = getUserById(dto.getClienteId());
+            AuthorizationDTO authorizationDTO = new AuthorizationDTO(cliente.getEmail(), cliente.getPassword());
+
+            boolean resultAuthorization = integrationApiService.authorizationRequest(authorizationDTO);
+            
+            if(!resultAuthorization){
+                throw new TransactionBusinessException("A autorização ao cliente para a transação nao foi concedida!");
+                
+            }
+            return null;
+        }
+        
+        
+        public Transaction notificationTransaction (TransactionDTO dto) throws TransactionBusinessException{
+        	
+        	 User lojista = getUserById(dto.getLojistaId());
+        	 NotificationDTO notificationDTO = new NotificationDTO(lojista.getEmail(), NOTIFICATION_MSG_STR, dto.getValor());
+             boolean resultNotification = integrationApiService.sendNotificationRequest(notificationDTO);
+             if(!resultNotification){
+                 throw new TransactionBusinessException("Falha ao notificar o lojista!");
+                 }
+             return null;
+        }
 
     private User getUserById(Long id){
         Optional<User> opUser = userRepository.findById(id);
