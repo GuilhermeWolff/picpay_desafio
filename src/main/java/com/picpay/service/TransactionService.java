@@ -50,7 +50,7 @@ public class TransactionService {
         return null;
     }
     
-        public Transaction userTransaction(TransactionDTO dto) throws TransactionBusinessException {
+        public Transaction checkClientTransferTransaction(TransactionDTO dto) throws TransactionBusinessException {
             User lojista = getUserById(dto.getLojistaId());
             Perfil payee = Perfil.toEnum(lojista.getPerfil());
 
