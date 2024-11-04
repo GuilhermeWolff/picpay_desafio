@@ -17,7 +17,7 @@ public class Transaction {
 
     @DateTimeFormat(pattern = "dd/MM/YYYY 24H:mm:ss")
     @Column(name="data_transacao")
-    private LocalDate dataTransacao;
+    private LocalDate dataTransacao = LocalDate.now();
 
     @Column(name="valor")
     private BigDecimal valor;

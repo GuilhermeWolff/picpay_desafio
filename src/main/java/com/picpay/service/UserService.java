@@ -37,7 +37,7 @@ public class UserService {
     }
     
     
-    public Optional<User> findUserById(Integer id) {
+    public Optional<User> findUserById(Long id) {
     	return userRepository.findById(id);
     }
 

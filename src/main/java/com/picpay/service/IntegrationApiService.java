@@ -40,6 +40,7 @@ public class IntegrationApiService {
 
             AuthorizationResponseDTO authorizationResponseDTO = responseEntity.getBody();
 
+            assert authorizationResponseDTO != null;
             return authorizationResponseDTO.getData().getAuthorization();
 
         } catch (RestClientException e){

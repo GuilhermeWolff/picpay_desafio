@@ -24,12 +24,12 @@ public class TransactionController {
     @PostMapping
     public ResponseEntity<Void> createTransaction(TransactionDTO dto){
         log.info("Iniciando o processamento da transacao: {}", dto);
-        Transaction transaction = service.createTransaction(dto);
-        /*
-         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}").buildAndExpand(user.getId()).toUri();
-
-         */
+        Transaction transaction = new Transaction();
+        try {
+            transaction = service.createTransaction(dto);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         log.info("Fim do processamento User{}", transaction);
         return ResponseEntity.ok().build();
 
