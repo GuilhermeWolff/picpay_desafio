@@ -7,11 +7,12 @@ import com.picpay.service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/v1/transacion")
+@RequestMapping("/v1/transaction")
 @Slf4j
 public class TransactionController {
 
@@ -22,7 +23,7 @@ public class TransactionController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createTransaction(TransactionDTO dto){
+    public ResponseEntity<Void> createTransaction(@RequestBody TransactionDTO dto){
         log.info("Iniciando o processamento da transacao: {}", dto);
         Transaction transaction = new Transaction();
         try {
@@ -30,7 +31,7 @@ public class TransactionController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        log.info("Fim do processamento User{}", transaction);
+        log.info("Fim do processamento User {}", transaction);
         return ResponseEntity.ok().build();
 
     }

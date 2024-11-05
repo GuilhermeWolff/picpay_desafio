@@ -36,17 +36,17 @@ public class TransactionService {
     }
 
     public Transaction createTransaction(TransactionDTO dto) throws TransactionBusinessException {
-        log.info("iniciando o processamento da transacao");
+        log.info("Iniciando o processamento da transacao");
 
         //validacao da existencia do usuario e do tipo de perfil
         log.info("Iniciando validacao de usuario");
         User customer = checkCustomer(dto.getClienteId());
 
-        validateBalance(customer, dto.getValor());
-
         //Validacao da existencia do lojsta e do tipo de perfil
         log.info("Iniciando validacao de lojista");
         User shopKeeper = checkShopkeeper(dto.getLojistaId());
+
+        validateBalanceAndUpdate(customer, shopKeeper, dto.getValor());
 
         //Autorizando a transacao
         authorizeTransaction(customer.getEmail(), customer.getPassword());
@@ -67,12 +67,13 @@ public class TransactionService {
          return repository.save(transaction);
     }
 
-    private void validateBalance(User customer, BigDecimal balance) throws TransactionBusinessException {
+    private void validateBalanceAndUpdate(User customer,User shopKeeper, BigDecimal balance) throws TransactionBusinessException {
 
-        if(customer.getSaldo().compareTo(balance)> 0){
+        if(customer.getSaldo().compareTo(balance) <= 0){
             throw new TransactionBusinessException("Saldo insuficiente");
         }
-
+        customer.setSaldo(customer.getSaldo().subtract(balance));
+        shopKeeper.setSaldo(balance);
     }
 
 

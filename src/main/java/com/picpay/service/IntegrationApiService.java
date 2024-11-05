@@ -4,7 +4,6 @@ package com.picpay.service;
 import com.picpay.dto.authorization.AuthorizationDTO;
 import com.picpay.dto.authorization.AuthorizationResponseDTO;
 import com.picpay.dto.notification.NotificationDTO;
-import com.picpay.dto.notification.NotificationResponseDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -51,26 +50,15 @@ public class IntegrationApiService {
 
     public Boolean sendNotificationRequest(NotificationDTO dto){
         HttpEntity<NotificationDTO> requestEntity = createRequestEntity(dto);
-
         try{
-            ResponseEntity<NotificationResponseDTO> responseEntity = restTemplate.exchange(messageNotificationUrl,
-                    HttpMethod.POST,
-                    requestEntity,
-                    NotificationResponseDTO.class);
-            NotificationResponseDTO notificationResponse  = responseEntity.getBody();
-
-            if(!notificationResponse.getStatus().equalsIgnoreCase("error")){
-                return true;
-            }
-            return false;
+            ResponseEntity<Void> responseEntity = restTemplate.exchange(messageNotificationUrl, HttpMethod.POST, requestEntity, Void.class);
+            return responseEntity.getStatusCode().is2xxSuccessful();
 
         }catch (RestClientException e){
             log.error("Erro ao notificar lojistas {}", e.getMessage());
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error ao notificar lojista");
         }
-
     }
-
 
 
     private <T> HttpEntity<T> createRequestEntity(T body) {
